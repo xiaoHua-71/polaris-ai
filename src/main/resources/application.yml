@@ -1,0 +1,12 @@
+server:
+  port: 8103
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: polaris-ai
+
+logging:
+  level:
+    com.xiaohua.polaris: debug
