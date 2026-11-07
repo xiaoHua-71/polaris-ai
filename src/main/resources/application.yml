@@ -16,8 +16,8 @@ spring:
           temperature: 0.7
   datasource:
     url: "jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:polaris_ai}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false"
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:}
+    username: root
+    password: root
     hikari:
       maximum-pool-size: 5
 
