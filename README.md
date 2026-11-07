@@ -43,9 +43,16 @@ curl -X POST http://localhost:8103/api/chat \
   -H 'Content-Type: application/json' \
   -d '{"message":"用一句话介绍你自己","conversationId":"11111111-1111-1111-1111-111111111111"}'
 # {"content":"..."}
+
+# 流式对话（SSE：delta / done / error）
+curl -N -X POST http://localhost:8103/api/chat/stream \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"用一句话介绍你自己","conversationId":"11111111-1111-1111-1111-111111111111"}'
+# event:delta
+# data:{"content":"我"}
 ```
 
-同一 `conversationId` 连续请求即可多轮对话；换 ID 即新会话。
+同一 `conversationId` 连续请求即可多轮对话；换 ID 即新会话。两个接口共享同一套记忆。
 
 中文请求体建议先写入 UTF-8 文件，再用 `curl --data-binary @文件`，避免 Windows 终端编码问题。
 
@@ -79,6 +86,7 @@ dev/polaris-ai
 - ✅ M0 项目骨架
 - ✅ M1 最小对话闭环（DeepSeek）
 - ✅ M2 多轮对话与记忆（MySQL 持久化，2026-11-07 验证通过）
-- ⬜ M3 流式输出（下一步）
+- ✅ M3 流式输出（SSE，2026-11-07 验证通过）
+- ⬜ M4 结构化输出与提示词（下一步）
 
 完整计划见 [docs/03-路线图与里程碑](docs/03-路线图与里程碑.md)。
