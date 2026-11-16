@@ -56,6 +56,12 @@ curl -X POST http://localhost:8103/api/chat/extract \
   -H 'Content-Type: application/json' \
   -d '{"message":"Zhang San is 30 and works in Hangzhou as a backend engineer."}'
 # {"name":"Zhang San","age":30,"city":"Hangzhou","occupation":"backend engineer"}
+
+# 带工具的对话（模型自主调用 getCurrentTime / calculate）
+curl -X POST http://localhost:8103/api/chat/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"What time is it in Shanghai? Also calculate (12+3)*4.","conversationId":"22222222-2222-2222-2222-222222222222"}'
+# {"content":"..."}
 ```
 
 同一 `conversationId` 连续请求即可多轮对话；换 ID 即新会话。两个接口共享同一套记忆。
@@ -81,7 +87,8 @@ dev/polaris-ai
     │   ├── java/com/xiaohua/polaris
     │   │   ├── PolarisApplication.java
     │   │   ├── chat/              # 对话 / 流式 / 结构化抽取接口
-    │   │   ├── config/            # ChatClient 配置
+    │   │   ├── tool/              # 只读工具与结果截断
+    │   │   ├── config/            # ChatClient / 工具装配
     │   │   ├── memory/            # MySQL 记忆仓库
     │   │   ├── observability/     # 链路 / prompt 日志 Advisor
     │   │   └── controller/        # Hello
@@ -98,5 +105,6 @@ dev/polaris-ai
 - ✅ M2 多轮对话与记忆（MySQL 持久化，2026-11-07 验证通过）
 - ✅ M3 流式输出（SSE，2026-11-07 验证通过）
 - ✅ M4 结构化输出与提示词（2026-11-16 验证通过）
+- ✅ M5 工具调用（2026-11-16 验证通过）
 
 完整计划见 [docs/03-路线图与里程碑](docs/03-路线图与里程碑.md)。
