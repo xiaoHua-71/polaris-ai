@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -33,7 +34,7 @@ public class ChatController {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
 
-    public ChatController(ChatClient chatClient, ObjectMapper objectMapper) {
+    public ChatController(@Qualifier("chatClient") ChatClient chatClient, ObjectMapper objectMapper) {
         this.chatClient = chatClient;
         this.objectMapper = objectMapper;
     }
