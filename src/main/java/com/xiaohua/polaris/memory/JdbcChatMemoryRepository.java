@@ -2,6 +2,8 @@ package com.xiaohua.polaris.memory;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class JdbcChatMemoryRepository implements ChatMemoryRepository {
+
+    private static final Logger log = LoggerFactory.getLogger(JdbcChatMemoryRepository.class);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -29,17 +33,23 @@ public class JdbcChatMemoryRepository implements ChatMemoryRepository {
 
     @Override
     public List<Message> findByConversationId(String conversationId) {
-        return jdbcTemplate.query(
+        long start = System.nanoTime();
+        List<Message> messages = jdbcTemplate.query(
                 "SELECT message_type, content FROM chat_message WHERE conversation_id = ? ORDER BY id",
                 (rs, rowNum) -> toMessage(rs.getString("message_type"), rs.getString("content")),
                 conversationId);
+        log.debug("读取记忆，conversationId={}，条数={}，耗时={}ms",
+                conversationId, messages.size(), elapsedMillis(start));
+        return messages;
     }
 
     @Override
     @Transactional
     public void saveAll(String conversationId, List<Message> messages) {
+        long start = System.nanoTime();
         jdbcTemplate.update("DELETE FROM chat_message WHERE conversation_id = ?", conversationId);
         if (messages.isEmpty()) {
+            log.debug("写入记忆，conversationId={}，条数=0，耗时={}ms", conversationId, elapsedMillis(start));
             return;
         }
         List<Object[]> rows = messages.stream()
@@ -48,6 +58,8 @@ public class JdbcChatMemoryRepository implements ChatMemoryRepository {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO chat_message (conversation_id, message_type, content) VALUES (?, ?, ?)",
                 rows);
+        log.debug("写入记忆，conversationId={}，条数={}，耗时={}ms",
+                conversationId, messages.size(), elapsedMillis(start));
     }
 
     @Override
@@ -67,5 +79,9 @@ public class JdbcChatMemoryRepository implements ChatMemoryRepository {
 
     private static String textOf(Message message) {
         return message.getText() == null ? "" : message.getText();
+    }
+
+    private static long elapsedMillis(long startNanos) {
+        return (System.nanoTime() - startNanos) / 1_000_000;
     }
 }

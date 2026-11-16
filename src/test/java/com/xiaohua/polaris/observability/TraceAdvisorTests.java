@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -65,7 +66,7 @@ class TraceAdvisorTests {
         ChatClientResponse actual = advisor.adviseCall(request("你好"), chain);
 
         assertThat(actual).isSameAs(expected);
-        assertThat(events()).anyMatch(event -> event.contains("模型请求")
+        assertThat(events()).anyMatch(event -> event.contains("模型调用开始")
                 && event.contains("conversationId=conv-1")
                 && event.contains("消息数=1")
                 && event.contains("USER:你好"));
@@ -108,6 +109,12 @@ class TraceAdvisorTests {
 
         assertThat(events().stream().filter(event -> event.contains("流式调用取消")).count()).isEqualTo(1);
         assertThat(events()).noneMatch(event -> event.contains("流式响应完成"));
+    }
+
+    @Test
+    void traceIsOutsideMemoryWhilePromptTraceIsInside() {
+        assertThat(TraceAdvisor.ORDER).isLessThan(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER);
+        assertThat(PromptTraceAdvisor.ORDER).isGreaterThan(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER);
     }
 
     @Test

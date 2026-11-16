@@ -24,11 +24,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.SignalType;
 
 /**
- * 记录模型调用的请求、响应、耗时与 token 用量，仅输出 DEBUG 日志，不改变调用链行为。
+ * 位于记忆 Advisor 外层，记录端到端链路：请求开始、响应、耗时、token、失败与取消。
+ * 内层只看记忆注入后的 prompt，见 {@link PromptTraceAdvisor}。
  */
 public final class TraceAdvisor implements CallAdvisor, StreamAdvisor {
 
-    static final int ORDER = Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER + 50;
+    static final int ORDER = Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER - 50;
 
     static final int PREVIEW_MAX_LENGTH = 200;
     static final int MESSAGE_PREVIEW_LENGTH = 40;
@@ -108,7 +109,7 @@ public final class TraceAdvisor implements CallAdvisor, StreamAdvisor {
 
     private static void logRequest(String conversationId, ChatClientRequest request) {
         List<Message> messages = request.prompt().getInstructions();
-        log.debug("模型请求，conversationId={}，消息数={}，消息摘要={}",
+        log.debug("模型调用开始，conversationId={}，消息数={}，消息摘要={}",
                 conversationId, messages.size(), summarizeMessages(messages));
     }
 

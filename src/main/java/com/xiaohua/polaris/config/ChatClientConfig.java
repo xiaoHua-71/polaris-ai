@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.xiaohua.polaris.observability.PromptTraceAdvisor;
 import com.xiaohua.polaris.observability.TraceAdvisor;
 
 @Configuration(proxyBeanMethods = false)
@@ -29,10 +30,17 @@ public class ChatClientConfig {
     }
 
     @Bean
-    ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory, TraceAdvisor traceAdvisor) {
+    PromptTraceAdvisor promptTraceAdvisor() {
+        return new PromptTraceAdvisor();
+    }
+
+    @Bean
+    ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory, TraceAdvisor traceAdvisor,
+            PromptTraceAdvisor promptTraceAdvisor) {
         return builder
                 .defaultSystem("你是 Polaris，一个简洁、乐于助人的中文 AI 助手。")
-                .defaultAdvisors(traceAdvisor, MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .defaultAdvisors(traceAdvisor, MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        promptTraceAdvisor)
                 .build();
     }
 }
