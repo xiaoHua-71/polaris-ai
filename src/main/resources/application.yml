@@ -14,6 +14,11 @@ spring:
         options:
           model: ${DEEPSEEK_MODEL:deepseek-chat}
           temperature: 0.7
+    tools:
+      limits:
+        max-calls-per-tool-default: 3
+        max-total-tool-calls: 5
+        on-limit-exceeded: RETURN_ERROR_RESPONSE
   datasource:
     url: "jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:polaris_ai}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false&connectTimeout=5000&socketTimeout=30000"
     username: root

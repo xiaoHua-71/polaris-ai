@@ -12,7 +12,8 @@ import static org.mockito.Mockito.mock;
 
 class ChatControllerStreamTests {
 
-    private final ChatController controller = new ChatController(mock(ChatClient.class), new JsonMapper());
+    private final ChatController controller = new ChatController(
+            mock(ChatClient.class), mock(ChatClient.class), new JsonMapper());
 
     @Test
     void rejectsBlankMessage() {

@@ -32,10 +32,13 @@ public class ChatController {
     private static final long STREAM_TIMEOUT_MILLIS = 120_000L;
 
     private final ChatClient chatClient;
+    private final ChatClient toolChatClient;
     private final ObjectMapper objectMapper;
 
-    public ChatController(@Qualifier("chatClient") ChatClient chatClient, ObjectMapper objectMapper) {
+    public ChatController(@Qualifier("chatClient") ChatClient chatClient,
+            @Qualifier("toolChatClient") ChatClient toolChatClient, ObjectMapper objectMapper) {
         this.chatClient = chatClient;
+        this.toolChatClient = toolChatClient;
         this.objectMapper = objectMapper;
     }
 
@@ -43,6 +46,17 @@ public class ChatController {
     public ChatResponse chat(@RequestBody ChatRequest request) {
         validate(request);
         String content = chatClient.prompt()
+                .user(request.message())
+                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, request.conversationId()))
+                .call()
+                .content();
+        return new ChatResponse(content);
+    }
+
+    @PostMapping("/tools")
+    public ChatResponse tools(@RequestBody ChatRequest request) {
+        validate(request);
+        String content = toolChatClient.prompt()
                 .user(request.message())
                 .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, request.conversationId()))
                 .call()
