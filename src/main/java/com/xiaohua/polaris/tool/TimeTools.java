@@ -8,6 +8,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.util.StringUtils;
 
+@ToolGroup(group = "time")
 public class TimeTools {
 
     private static final ZoneId DEFAULT_ZONE = ZoneId.of("Asia/Shanghai");

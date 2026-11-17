@@ -9,6 +9,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.util.StringUtils;
 
+@ToolGroup(group = "calc")
 public class CalculatorTools {
 
     private static final ExpressionParser PARSER = new SpelExpressionParser();

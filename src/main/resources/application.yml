@@ -30,6 +30,9 @@ polaris:
   chat:
     memory:
       max-messages: ${CHAT_MEMORY_MAX_MESSAGES:20}
+  tools:
+    # 逗号分隔的工具分组，留空表示加载全部
+    groups: ${TOOL_GROUPS:}
 
 logging:
   level:
