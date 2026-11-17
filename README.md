@@ -1,6 +1,20 @@
 # Polaris AI
 
-北极星 —— 一个基于 **Spring AI** 的个人实验项目。目标是走通「对话 → 记忆 → 流式 → 结构化输出 → 工具调用 → RAG → MCP」全链路，并与 LangChain4j 项目 star-knowledge-assistant 形成对照。
+![Java](https://img.shields.io/badge/Java-21-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0.2-6DB33F)
+![Model](https://img.shields.io/badge/Model-DeepSeek-4D6BFE)
+
+**一个能真正跑起来的 Spring AI 全链路实战工程。**
+
+北极星（Polaris）从一条最小对话开始，逐个打通「对话 → 记忆 → 流式输出 → 结构化输出 → 工具调用 → RAG → MCP」。每一站都留下可执行的验证命令、实测结论和踩坑记录——它不是 API 文档的搬运，而是一份回答「Spring AI 在真实工程里到底怎么写、坑在哪」的实践笔记。
+
+- **完整链路**：ChatClient、Advisor、Memory、Tool Calling 串成一条线，不是孤立 demo
+- **可复现**：每个里程碑都有验证记录，照着 README 就能在本机跑通
+- **可对照**：与 LangChain4j 项目 star-knowledge-assistant 同题实现，看清两个框架的取舍
+- **诚实边界**：单机实验项目，不追求生产可用；没实测过的结论一律标注「待验证」
+
+目前已走完 M0–M5，RAG 与 MCP 在路线图上。如果你正在做 Spring AI 选型，或想找一个从 0 到 1 的 LLM 应用参考实现，可以从这里开始。
 
 ## 技术栈
 
