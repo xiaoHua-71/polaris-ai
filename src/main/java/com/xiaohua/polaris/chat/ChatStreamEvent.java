@@ -1,16 +1,14 @@
 package com.xiaohua.polaris.chat;
 
-public final class ChatStreamEvent {
+public sealed interface ChatStreamEvent
+        permits ChatStreamEvent.Delta, ChatStreamEvent.Done, ChatStreamEvent.Error {
 
-    private ChatStreamEvent() {
+    record Delta(String content) implements ChatStreamEvent {
     }
 
-    public record Delta(String content) {
+    record Done(String conversationId) implements ChatStreamEvent {
     }
 
-    public record Done(String conversationId) {
-    }
-
-    public record Error(String message) {
+    record Error(String message) implements ChatStreamEvent {
     }
 }

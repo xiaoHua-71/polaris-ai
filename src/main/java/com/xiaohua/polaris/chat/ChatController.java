@@ -84,25 +84,32 @@ public class ChatController {
                 .content();
 
         subscription.update(tokens.subscribe(
-                token -> send(emitter, subscription, "delta", new ChatStreamEvent.Delta(token)),
+                token -> send(emitter, subscription, new ChatStreamEvent.Delta(token)),
                 error -> {
                     log.error("流式对话失败，conversationId={}", request.conversationId(), error);
-                    send(emitter, subscription, "error",
-                            new ChatStreamEvent.Error("模型调用失败：" + error.getMessage()));
+                    send(emitter, subscription, new ChatStreamEvent.Error("模型调用失败：" + error.getMessage()));
                     emitter.complete();
                 },
                 () -> {
-                    send(emitter, subscription, "done", new ChatStreamEvent.Done(request.conversationId()));
+                    send(emitter, subscription, new ChatStreamEvent.Done(request.conversationId()));
                     emitter.complete();
                 }));
         return emitter;
     }
 
-    private void send(SseEmitter emitter, Disposable.Swap subscription, String event, Object payload) {
+    static String eventName(ChatStreamEvent event) {
+        return switch (event) {
+            case ChatStreamEvent.Delta(String content) -> "delta";
+            case ChatStreamEvent.Done(String conversationId) -> "done";
+            case ChatStreamEvent.Error(String message) -> "error";
+        };
+    }
+
+    private void send(SseEmitter emitter, Disposable.Swap subscription, ChatStreamEvent event) {
         try {
             emitter.send(SseEmitter.event()
-                    .name(event)
-                    .data(objectMapper.writeValueAsString(payload), MediaType.APPLICATION_JSON));
+                    .name(eventName(event))
+                    .data(objectMapper.writeValueAsString(event), MediaType.APPLICATION_JSON));
         }
         catch (IOException | IllegalStateException | JacksonException ex) {
             log.debug("SSE 发送失败，客户端可能已断开，取消上游模型调用：{}", ex.toString());
