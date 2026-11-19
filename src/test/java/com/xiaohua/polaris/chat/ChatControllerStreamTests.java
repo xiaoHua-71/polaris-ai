@@ -30,6 +30,25 @@ class ChatControllerStreamTests {
         assertBadRequest(new ChatRequest("你好", "x".repeat(65)), "64");
     }
 
+    @Test
+    void mapsStreamEventTypesToSseEventNames() {
+        assertThat(ChatController.eventName(new ChatStreamEvent.Delta("你"))).isEqualTo("delta");
+        assertThat(ChatController.eventName(new ChatStreamEvent.Done("c1"))).isEqualTo("done");
+        assertThat(ChatController.eventName(new ChatStreamEvent.Error("失败"))).isEqualTo("error");
+    }
+
+    @Test
+    void serializesStreamEventPayloadAsJson() throws Exception {
+        JsonMapper mapper = new JsonMapper();
+
+        assertThat(mapper.writeValueAsString(new ChatStreamEvent.Delta("你")))
+                .isEqualTo("{\"content\":\"你\"}");
+        assertThat(mapper.writeValueAsString(new ChatStreamEvent.Done("c1")))
+                .isEqualTo("{\"conversationId\":\"c1\"}");
+        assertThat(mapper.writeValueAsString(new ChatStreamEvent.Error("失败")))
+                .isEqualTo("{\"message\":\"失败\"}");
+    }
+
     private void assertBadRequest(ChatRequest request, String reason) {
         assertThatThrownBy(() -> controller.stream(request))
                 .isInstanceOfSatisfying(ResponseStatusException.class, ex -> {

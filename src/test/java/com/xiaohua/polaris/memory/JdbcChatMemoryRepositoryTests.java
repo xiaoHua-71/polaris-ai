@@ -47,10 +47,10 @@ class JdbcChatMemoryRepositoryTests {
         List<Message> messages = repository.findByConversationId("c1");
 
         assertThat(messages).hasSize(2);
-        assertThat(messages.get(0).getMessageType()).isEqualTo(MessageType.USER);
-        assertThat(messages.get(0).getText()).isEqualTo("我叫 Alice");
-        assertThat(messages.get(1).getMessageType()).isEqualTo(MessageType.ASSISTANT);
-        assertThat(messages.get(1).getText()).isEqualTo("你好，Alice");
+        assertThat(messages.getFirst().getMessageType()).isEqualTo(MessageType.USER);
+        assertThat(messages.getFirst().getText()).isEqualTo("我叫 Alice");
+        assertThat(messages.getLast().getMessageType()).isEqualTo(MessageType.ASSISTANT);
+        assertThat(messages.getLast().getText()).isEqualTo("你好，Alice");
     }
 
     @Test
@@ -88,7 +88,7 @@ class JdbcChatMemoryRepositoryTests {
     void mapsSystemMessage() {
         repository.saveAll("c1", List.of(new SystemMessage("系统提示")));
 
-        Message message = repository.findByConversationId("c1").get(0);
+        Message message = repository.findByConversationId("c1").getFirst();
 
         assertThat(message.getMessageType()).isEqualTo(MessageType.SYSTEM);
         assertThat(message.getText()).isEqualTo("系统提示");

@@ -88,7 +88,7 @@ class TraceAdvisorTests {
         List<ChatClientResponse> actual = advisor.adviseStream(request("你好"), chain).collectList().block();
 
         assertThat(actual).hasSize(3);
-        assertThat(actual.get(0).chatResponse().getResult().getOutput().getText()).isEqualTo("你");
+        assertThat(actual.getFirst().chatResponse().getResult().getOutput().getText()).isEqualTo("你");
         assertThat(actual.get(1).chatResponse().getResult().getOutput().getText()).isEqualTo("好");
         assertThat(events().stream().filter(event -> event.contains("流式首 token")).count()).isEqualTo(1);
         assertThat(events()).anyMatch(event -> event.contains("流式响应完成")

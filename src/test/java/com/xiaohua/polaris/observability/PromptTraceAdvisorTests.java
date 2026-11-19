@@ -77,8 +77,8 @@ class PromptTraceAdvisorTests {
         List<ChatClientResponse> actual = advisor.adviseStream(request(), chain).collectList().block();
 
         assertThat(actual).hasSize(2);
-        assertThat(actual.get(0).chatResponse().getResult().getOutput().getText()).isEqualTo("你");
-        assertThat(actual.get(1).chatResponse().getResult().getOutput().getText()).isEqualTo("好");
+        assertThat(actual.getFirst().chatResponse().getResult().getOutput().getText()).isEqualTo("你");
+        assertThat(actual.getLast().chatResponse().getResult().getOutput().getText()).isEqualTo("好");
         assertThat(events().stream().filter(event -> event.contains("最终 prompt")).count()).isEqualTo(1);
     }
 
