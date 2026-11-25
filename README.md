@@ -14,7 +14,7 @@
 - **可对照**：与 LangChain4j 项目 star-knowledge-assistant 同题实现，看清两个框架的取舍
 - **诚实边界**：单机实验项目，不追求生产可用；没实测过的结论一律标注「待验证」
 
-目前已走完 M0–M5，RAG 与 MCP 在路线图上。如果你正在做 Spring AI 选型，或想找一个从 0 到 1 的 LLM 应用参考实现，可以从这里开始。
+目前已走完 M0–M6，MCP 在路线图上。如果你正在做 Spring AI 选型，或想找一个从 0 到 1 的 LLM 应用参考实现，可以从这里开始。
 
 ## 技术栈
 
@@ -24,6 +24,7 @@
 | Spring Boot | 4.1.2 |
 | Spring AI | 2.0.2（OpenAI starter 已启用，OpenAI 兼容协议接入 DeepSeek） |
 | 模型服务 | DeepSeek 官方，默认 `deepseek-chat` |
+| 嵌入模型 | 本地 ONNX `bge-small-zh-v1.5`（512 维，不调用远程 embedding API） |
 | 数据库 | MySQL 8（多轮记忆，库 `polaris_ai`，表 `chat_message`） |
 | 构建 | Maven |
 
@@ -35,11 +36,20 @@
 # 首次运行：建库建表（可重复执行）
 mysql -u root -p < sql/schema.sql
 
+# 首次运行：下载本地嵌入模型（约 91 MB，放在 gitignore 的 models/ 下）
+mkdir -p models/bge-small-zh-v1.5
+curl -L -o models/bge-small-zh-v1.5/model.onnx \
+  "https://hf-mirror.com/Xenova/bge-small-zh-v1.5/resolve/main/onnx/model.onnx"
+curl -L -o models/bge-small-zh-v1.5/tokenizer.json \
+  "https://hf-mirror.com/Xenova/bge-small-zh-v1.5/resolve/main/tokenizer.json"
+
 export JAVA_HOME=/e/Java/jdk-21.0.5
 export DEEPSEEK_API_KEY=<your-key>
 export MYSQL_PASSWORD=<your-mysql-password>
 mvn spring-boot:run
 ```
+
+> 除对话模型外，RAG 的嵌入模型在本地进程内运行，不产生 embedding API 费用。模型文件缺失时应用会在启动阶段失败并提示路径。
 
 服务端口 `8103`，上下文路径 `/api`。MySQL 地址、库名、用户名可分别用 `MYSQL_HOST` / `MYSQL_PORT` / `MYSQL_DATABASE` / `MYSQL_USERNAME` 覆盖，默认 `localhost:3306/polaris_ai`、`root`。
 
@@ -76,6 +86,12 @@ curl -X POST http://localhost:8103/api/chat/tools \
   -H 'Content-Type: application/json' \
   -d '{"message":"What time is it in Shanghai? Also calculate (12+3)*4.","conversationId":"22222222-2222-2222-2222-222222222222"}'
 # {"content":"..."}
+
+# RAG 检索问答（本地嵌入 + DeepSeek 生成，返回 sources）
+curl -X POST http://localhost:8103/api/rag/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"RAG 的 topK 默认是多少？"}'
+# {"content":"4","sources":[{"source":"polaris-rag.md",...}]}
 ```
 
 同一 `conversationId` 连续请求即可多轮对话；换 ID 即新会话。两个接口共享同一套记忆。
@@ -88,6 +104,7 @@ curl -X POST http://localhost:8103/api/chat/tools \
 - [docs/03-路线图与里程碑](docs/03-路线图与里程碑.md) —— M0–M8 计划
 - [docs/05-当前实现与验证](docs/05-当前实现与验证.md) —— 已经有什么、验证到什么程度
 - [docs/06-风险与待验证](docs/06-风险与待验证.md) —— 实测事实与待验证项
+- [docs/20-RAG-概述](docs/20-RAG-概述.md) —— M6：本地嵌入、切片、检索与评估
 
 ## 目录
 
@@ -120,5 +137,6 @@ dev/polaris-ai
 - ✅ M3 流式输出（SSE，2026-11-07 验证通过）
 - ✅ M4 结构化输出与提示词（2026-11-16 验证通过）
 - ✅ M5 工具调用（2026-11-16 验证通过）
+- ✅ M6 RAG 基础链路（2026-11-25：本地嵌入 + 检索问答，Hit@4 10/10）
 
 完整计划见 [docs/03-路线图与里程碑](docs/03-路线图与里程碑.md)。
