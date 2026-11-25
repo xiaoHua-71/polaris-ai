@@ -12,3 +12,7 @@ target/
 .DS_Store
 *.log
 logs/
+
+# 本地 ONNX 嵌入模型与推理缓存（体积大，不入库）
+models/
+.cache/

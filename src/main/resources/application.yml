@@ -7,6 +7,19 @@ spring:
   application:
     name: polaris-ai
   ai:
+    model:
+      # 显式选择本地 embedding，避免 OpenAI starter 同时装配 EmbeddingModel
+      embedding: transformers
+    embedding:
+      transformer:
+        onnx:
+          model-uri: ${RAG_MODEL_URI:file:./models/bge-small-zh-v1.5/model.onnx}
+          model-output-name: last_hidden_state
+        tokenizer:
+          uri: ${RAG_TOKENIZER_URI:file:./models/bge-small-zh-v1.5/tokenizer.json}
+        cache:
+          enabled: true
+          directory: .cache/onnx
     openai:
       api-key: ${DEEPSEEK_API_KEY:}
       base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
@@ -33,6 +46,11 @@ polaris:
   tools:
     # 逗号分隔的工具分组，留空表示加载全部
     groups: ${TOOL_GROUPS:}
+  rag:
+    enabled: ${RAG_ENABLED:true}
+    top-k: ${RAG_TOP_K:4}
+    similarity-threshold: ${RAG_SIMILARITY_THRESHOLD:0.0}
+    knowledge-location: ${RAG_KNOWLEDGE_LOCATION:classpath:knowledge/*.md}
 
 logging:
   level:
