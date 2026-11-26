@@ -21,6 +21,10 @@
 
 7. [工具对话](7-工具对话.md) —— `POST /api/chat/tools`，模型自主调用工具，同步返回
 
+## M6 · RAG 知识库问答
+
+8. [RAG 问答](8-RAG问答.md) —— `POST /api/rag/chat`，无记忆，返回回答与检索来源
+
 > 前置：M2 的 1–4 已完成，`conversationId` 已接入。
 >
 > 主版本位于后端仓库 `polaris-ai/docs/frontend/`；前端仓库 `docs/` 下是同内容副本。有冲突以主版本为准。

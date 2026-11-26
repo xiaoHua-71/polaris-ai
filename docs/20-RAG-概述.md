@@ -384,6 +384,8 @@ docs/
   20-RAG-概述.md          # 本文
 ```
 
+前端对接文档：[frontend/8-RAG问答](frontend/8-RAG问答.md)（已同步到前端仓库 `docs/`）。
+
 ### 模型下载（首次运行）
 
 ```bash
